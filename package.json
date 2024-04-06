@@ -11,5 +11,12 @@
   "devDependencies": {
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@formkit/addons": "^1.6.1",
+    "@formkit/icons": "^1.6.1",
+    "@formkit/vue": "^1.6.1",
+    "formkit": "^1.6.1",
+    "vue": "^3.4.21"
   }
 }
