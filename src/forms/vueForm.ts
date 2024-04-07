@@ -1,9 +1,10 @@
-import {createApp} from 'vue';
-import FormFromTypo3Json from "./components/FormFromTypo3Json.vue";
-import {defaultConfig, plugin} from "@formkit/vue";
+import { createApp } from 'vue';
+import FormFromTypo3Json from "./formvue3/components/FormFromTypo3Json.vue";
+import { defaultConfig, plugin } from "@formkit/vue";
 import '@formkit/themes/genesis'
 import { createFloatingLabelsPlugin } from '@formkit/addons'
-import {FormKitSchemaDefinition} from "@formkit/core";
+import { FormKitSchemaDefinition } from "@formkit/core";
+import { FormWrapper } from './formvue3/FormDefinition';
 
 
 export default function initVueForms() {
@@ -15,7 +16,7 @@ export default function initVueForms() {
     if (!formConfigsList) return formViews;
 
 
-    function scrollToElement(inputWithError) {
+    function scrollToElement(inputWithError: HTMLElement) {
         if (inputWithError && inputWithError.getBoundingClientRect) {
             let scrollTarget = inputWithError.getBoundingClientRect().top + window.scrollY;
             const offset = 100;
@@ -33,14 +34,15 @@ export default function initVueForms() {
         const wrapper = document.querySelector('[data-id="' + id + '"]');
 
         if (!wrapper) continue;
-        const formSchema = formConfigsList[id];
+
+        const formSchema: FormWrapper = formConfigsList[id];
         if (!formSchema?.configuration) continue;
 
         /**
          *
          * @type FormKitSchemaDefinition
          */
-        const testSchema=[
+        const testSchema = [
             {
                 $el: 'h1',
                 children: 'Register',
@@ -106,7 +108,7 @@ export default function initVueForms() {
             FormFromTypo3Json,
             {
                 formSchema: testSchema,
-                typo3FormConfig: formSchema,
+                typo3FormConfig: formSchema.configuration,
                 library: {
 
                 }
