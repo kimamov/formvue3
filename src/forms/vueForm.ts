@@ -9,7 +9,7 @@ import { FormWrapper } from './formvue3/FormDefinition';
 
 export default function initVueForms() {
     const forms = document.querySelectorAll('[data-id]');
-    const formConfigsList = window.extendedforms;
+    const formConfigsList = (window as any).extendedforms;
 
     const formViews = {};
 
@@ -31,6 +31,7 @@ export default function initVueForms() {
 
     for (let form of forms) {
         const id = form.getAttribute('data-id');
+        if (!id) continue;
         const wrapper = document.querySelector('[data-id="' + id + '"]');
 
         if (!wrapper) continue;
