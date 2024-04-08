@@ -3,7 +3,7 @@ import FormFromTypo3Json from "./formvue3/components/FormFromTypo3Json.vue";
 import { defaultConfig, plugin } from "@formkit/vue";
 import '@formkit/themes/genesis'
 import { createFloatingLabelsPlugin } from '@formkit/addons'
-import { FormKitSchemaDefinition } from "@formkit/core";
+// import { FormKitSchemaDefinition } from "@formkit/core";
 import { FormWrapper } from './formvue3/FormDefinition';
 
 
@@ -14,6 +14,9 @@ export default function initVueForms() {
     const formViews = {};
 
     if (!formConfigsList) return formViews;
+
+
+
 
 
     function scrollToElement(inputWithError: HTMLElement) {
@@ -30,7 +33,9 @@ export default function initVueForms() {
     }
 
     for (let form of forms) {
+        console.log(form);
         const id = form.getAttribute('data-id');
+
         if (!id) continue;
         const wrapper = document.querySelector('[data-id="' + id + '"]');
 
@@ -38,6 +43,7 @@ export default function initVueForms() {
 
         const formSchema: FormWrapper = formConfigsList[id];
         if (!formSchema?.configuration) continue;
+        console.log(formSchema);
 
         /**
          *
@@ -109,8 +115,11 @@ export default function initVueForms() {
             FormFromTypo3Json,
             {
                 formSchema: testSchema,
-                typo3FormConfig: formSchema.configuration,
+                typo3FormConfig: formSchema,
                 library: {
+
+                },
+                typo3ToFormSchemaMappings: {
 
                 }
             }

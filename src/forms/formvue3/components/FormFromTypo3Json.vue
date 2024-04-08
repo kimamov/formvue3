@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { FormKitSchema } from "@formkit/vue";
-import { FormKitSchemaDefinition } from "@formkit/core";
+// import { FormKitSchemaDefinition } from "@formkit/core";
 import { computed, onMounted } from "vue";
+import { ElementDefinition } from "../FormDefinition";
 
 const props = defineProps({
   formSchema: {
-    type: FormKitSchemaDefinition,
     default: () => []
   },
   library: {
@@ -17,19 +17,24 @@ const props = defineProps({
   typo3FormConfig: {
     type: Object,
     required: true
+  },
+  typo3ToFormSchemaMappings: {
+    type: Object,
+    default: () => { }
   }
 }
 )
 
-const typo3FormTypesToFormKitTypes = {
+const typo3FormTypesToFormKitTypes: Record<string, Record<string, string>> = {
   Text: { $formkit: 'text' },
   Email: { $formkit: 'email' },
   Number: { $formkit: 'number' },
-  // Honeypot: HiddenfieldHoneypot,
+  Honeypot: { $formkit: 'hidden' },
+  Hidden: { $formkit: 'hidden' },
   Checkbox: { $formkit: 'checkbox' },
   SingleSelect: { $formkit: 'select' },
   // EmailSingleSelect: OnSelect,
-  // Textarea: OnTextArea,
+  Textarea: { $formkit: 'textarea' },
   // Oncaptcha: OnCaptcha,
   // FileUpload: FileUpload,
   // Telephone: Telephone,
@@ -56,8 +61,9 @@ const typo3FormTypesToFormKitTypes = {
 
 const formkitSchemaFromTypo3Config = computed(() => {
   if (!props.typo3FormConfig?.configuration?.elements?.length) return [];
+  console.log(props.typo3FormConfig.configuration.elements)
 
-  return props.typo3FormConfig.configuration.elements.map(el => {
+  return props.typo3FormConfig.configuration.elements.map((el: ElementDefinition) => {
     const obj = typo3FormTypesToFormKitTypes[el.type];
 
     if (!obj) return {
@@ -68,12 +74,16 @@ const formkitSchemaFromTypo3Config = computed(() => {
       },
     }
 
+    console.log(obj);
+
+
     return {
       ...obj,
       name: el.name,
       label: el.label,
       help: 'help',
-      validationLabel: el.properties?.fluidAdditionalAttributes?.required ?? 'default validation message'
+      validationLabel: el.properties?.fluidAdditionalAttributes?.required ?? 'default validation message',
+      required: true
     }
   })
 
@@ -83,7 +93,7 @@ onMounted(() => {
   console.log(props.typo3FormConfig)
 })
 
-async function submitForm(data) {
+async function submitForm(data: any) {
   console.log({ data })
 }
 </script>
@@ -93,7 +103,7 @@ async function submitForm(data) {
   <div class="fv-app">
     <slot name="beforeSchema"></slot>
     <FormKit type="form" @submit="submitForm">
-      <FormKitSchema :schema="formkitSchemaFromTypo3Config" :library="library" />
+      <FormKitSchema :schema="formkitSchemaFromTypo3Config" />
     </FormKit>
     <slot name="afterSchema"></slot>
   </div>
