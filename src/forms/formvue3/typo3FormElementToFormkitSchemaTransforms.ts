@@ -44,32 +44,37 @@ export function typo3ToFormkitValidation(validators: InputValidator[]) {
 }
 
 export function simpleInputTransform(el: ElementDefinition, formkitType: string = 'text'): object {
-    const out: Record<string, any> = {
+    const schema: Record<string, any> = {
 
         $formkit: formkitType,
         label: el.label,
         value: el.defaultValue,
-
+        id: el.identifier,
+        props: {
+            "class": "fv_" + el.identifier
+        }
     };
 
 
-    out.name = el.name;
+    schema.name = el.name;
 
     if (el.validators?.length) {
 
         const validations = typo3ToFormkitValidation(el.validators);
         if (validations.validation.length) {
-            out.validation = validations.validation;
-            out.validationMessages = validations.validationMessages;
+            schema.validation = validations.validation;
+            schema.validationMessages = validations.validationMessages;
         }
     }
 
-    if (el.properties?.options?.length) {
-        out.options = el.properties.options;
+    if (el.properties?.options) {
+        schema.options = el.properties.options;
+        schema.placeholder = el.label;
+
     }
+    // console.log(schema);
 
-
-    return out;
+    return schema;
 }
 
 function columnSizes(el: ElementDefinition) {
@@ -123,16 +128,23 @@ export function gridRow(el: ElementDefinition) {
     if (el.elements?.length) {
         schema.children = el.elements.map((child) => {
             const sizes = columnSizes(child);
+            const content = transformTypo3ForElementToFormkitSchema(child)
+            const children = content ? [content] : [];
+            console.log(content);
+
+
             const childSchema = {
                 $el: "div",
                 attrs: {
                     class: `grid__column col-${sizes.xs} col-sm-${sizes.sm} col-md-${sizes.md} col-lg-${sizes.lg}`
                 },
-                children: transformTypo3ForElementToFormkitSchema(child)
+                children: children
             }
             return childSchema;
         })
     }
+    console.log({ schema });
+
     return schema;
 }
 
@@ -140,6 +152,13 @@ export function gridCol(el: ElementDefinition) {
     const schema = { $el: "div" }
     return schema;
 
+}
+
+export function staticText(el: ElementDefinition) {
+    return {
+        $el: "div",
+        children: el.label
+    }
 }
 
 
@@ -156,7 +175,7 @@ export const defaultMappings: Typo3ElementTypeToFormkitMapping = {
     // Oncaptcha: OnCaptcha,
     FileUpload: (el) => simpleInputTransform(el, 'file'),
     Telephone: (el) => simpleInputTransform(el, 'tel'),
-    // StaticText: StaticText,
+    StaticText: staticText,
     RadioButton: (el) => simpleInputTransform(el, 'radio'),
     // DatePicker: DatePicker,
     GridRow: gridRow,
