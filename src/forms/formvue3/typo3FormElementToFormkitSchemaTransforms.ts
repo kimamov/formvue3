@@ -51,6 +51,10 @@ export function simpleInputTransform(el: ElementDefinition, formkitType: string 
         value: el.defaultValue,
 
     };
+
+
+    out.name = el.name;
+
     if (el.validators?.length) {
 
         const validations = typo3ToFormkitValidation(el.validators);
@@ -60,7 +64,6 @@ export function simpleInputTransform(el: ElementDefinition, formkitType: string 
         }
     }
 
-
     if (el.properties?.options?.length) {
         out.options = el.properties.options;
     }
@@ -69,13 +72,72 @@ export function simpleInputTransform(el: ElementDefinition, formkitType: string 
     return out;
 }
 
+function columnSizes(el: ElementDefinition) {
+    const validSizeOrFullWidth = (sizeKey: string) => {
+        const defaultSize = 12; // 12 columns the entire container
+
+        const gridColumnConfigObj =
+            el.properties.gridColumnClassAutoConfiguration;
+        if (!gridColumnConfigObj) return defaultSize;
+
+        const viewportsObj = gridColumnConfigObj.viewPorts;
+        if (!viewportsObj) return defaultSize;
+
+        const sizeObj = viewportsObj[sizeKey];
+        if (!sizeObj) return defaultSize;
+
+        const size = sizeObj.numbersOfColumnsToUse;
+        if (!size || isNaN(size) || size < 1 || size > 12) {
+            return defaultSize;
+        }
+        return size;
+    };
+
+    if (typeof el.properties === "object") {
+        return {
+            lg: validSizeOrFullWidth("lg"),
+            md: validSizeOrFullWidth("md"),
+            sm: validSizeOrFullWidth("sm"),
+            xs: validSizeOrFullWidth("xs"),
+        };
+    }
+
+    return {
+        lg: 12,
+        md: 12,
+        sm: 12,
+        xs: 12,
+    };
+}
+
+
 export function gridRow(el: ElementDefinition) {
-    const schema = {}
+    const schema: any = {
+        $el: "div",
+        attrs: {
+            class: "grid"
+        }
+    }
+
+
+    if (el.elements?.length) {
+        schema.children = el.elements.map((child) => {
+            const sizes = columnSizes(child);
+            const childSchema = {
+                $el: "div",
+                attrs: {
+                    class: `grid__column col-${sizes.xs} col-sm-${sizes.sm} col-md-${sizes.md} col-lg-${sizes.lg}`
+                },
+                children: transformTypo3ForElementToFormkitSchema(child)
+            }
+            return childSchema;
+        })
+    }
     return schema;
 }
 
 export function gridCol(el: ElementDefinition) {
-    const schema = {}
+    const schema = { $el: "div" }
     return schema;
 
 }
@@ -95,7 +157,7 @@ export const defaultMappings: Typo3ElementTypeToFormkitMapping = {
     FileUpload: (el) => simpleInputTransform(el, 'file'),
     Telephone: (el) => simpleInputTransform(el, 'tel'),
     // StaticText: StaticText,
-    // RadioButton: OnRadioGroup,
+    RadioButton: (el) => simpleInputTransform(el, 'radio'),
     // DatePicker: DatePicker,
     GridRow: gridRow,
     // MaskedText: MaskedText,
@@ -115,7 +177,7 @@ export const defaultMappings: Typo3ElementTypeToFormkitMapping = {
 }
 
 
-export function transformTypo3ForElementToFormkitSchema(typo3ElementDefinition: ElementDefinition, mappingsOverride: Typo3ElementTypeToFormkitMapping) {
+export function transformTypo3ForElementToFormkitSchema(typo3ElementDefinition: ElementDefinition, mappingsOverride?: Typo3ElementTypeToFormkitMapping = {}) {
     const combinedMappings = { ...defaultMappings, ...mappingsOverride };
 
     const transformer = combinedMappings[typo3ElementDefinition.type];
