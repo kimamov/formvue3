@@ -1,0 +1,6 @@
+@import '~vuetify/src/components/VRadioGroup/VRadioGroup';
+@import '~vuetify/src/components/VRadioGroup/VRadio';
+
+.ondigo-radio:not(.v-input--radio-group--column) .v-radio {
+  margin-left: 10px;
+}

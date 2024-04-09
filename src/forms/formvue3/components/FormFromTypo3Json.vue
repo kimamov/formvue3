@@ -3,6 +3,7 @@ import { FormKitSchema } from "@formkit/vue";
 // import { FormKitSchemaDefinition } from "@formkit/core";
 import { computed, onMounted } from "vue";
 import { ElementDefinition } from "../FormDefinition";
+import { transformTypo3ForElementToFormkitSchema } from '../typo3FormElementToFormkitSchemaTransforms';
 
 const props = defineProps({
   formSchema: {
@@ -25,66 +26,12 @@ const props = defineProps({
 }
 )
 
-const typo3FormTypesToFormKitTypes: Record<string, Record<string, string>> = {
-  Text: { $formkit: 'text' },
-  Email: { $formkit: 'email' },
-  Number: { $formkit: 'number' },
-  Honeypot: { $formkit: 'hidden' },
-  Hidden: { $formkit: 'hidden' },
-  Checkbox: { $formkit: 'checkbox' },
-  SingleSelect: { $formkit: 'select' },
-  // EmailSingleSelect: OnSelect,
-  Textarea: { $formkit: 'textarea' },
-  // Oncaptcha: OnCaptcha,
-  // FileUpload: FileUpload,
-  // Telephone: Telephone,
-  // StaticText: StaticText,
-  // RadioButton: OnRadioGroup,
-  // DatePicker: DatePicker,
-  // GridRow: FormGridRow,
-  // MaskedText: MaskedText,
-  // ConditionCheckbox: ConditionCheckbox,
-  // ConditionRadio: ConditionRadio,
-  // ConditionalContent: ConditionalContent,
-  // ContentElement: ContentElement,
-  // ApplicationVideoUrl: ApplicationVideoUrl,
-  // MultiCheckbox: MultiCheckbox,
-  // Url: Url,
-  // ImageUpload: FileUpload,
-  // ElementsRepeater: FieldRepeater,
-  // DisplayRepeatCondition: RepeatedContent,
-  // Fieldset: Fieldset,
-  // ConditionSelect: ConditionSelect,
-  // SubmitButton: SubmitButton,
-  // BackButton: BackButton
-}
-
 const formkitSchemaFromTypo3Config = computed(() => {
   if (!props.typo3FormConfig?.configuration?.elements?.length) return [];
   console.log(props.typo3FormConfig.configuration.elements)
 
   return props.typo3FormConfig.configuration.elements.map((el: ElementDefinition) => {
-    const obj = typo3FormTypesToFormKitTypes[el.type];
-
-    if (!obj) return {
-      $el: 'p',
-      children: `unknown form element ${el.type}`,
-      attrs: {
-        class: 'text-2xl font-bold mb-4',
-      },
-    }
-
-    console.log(obj);
-
-
-    return {
-      ...obj,
-      name: el.name,
-      label: el.label,
-      help: 'help',
-      validationLabel: el.properties?.fluidAdditionalAttributes?.required ?? 'default validation message',
-      required: true
-    }
+    return transformTypo3ForElementToFormkitSchema(el, props.typo3ToFormSchemaMappings)
   })
 
 })
@@ -114,6 +61,7 @@ async function submitForm(data: any) {
 .fv-app {
   font-size: 16px;
   line-height: 1.1;
+  padding: 20px;
 
   * {
     font-size: inherit;
