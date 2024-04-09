@@ -49,9 +49,8 @@ export function simpleInputTransform(el: ElementDefinition, formkitType: string 
         $formkit: formkitType,
         label: el.label,
         value: el.defaultValue,
-        id: el.identifier,
-        props: {
-            "class": "fv_" + el.identifier
+        classes: {
+            outer: "fv_" + el.identifier
         }
     };
 
