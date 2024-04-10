@@ -46,7 +46,7 @@ export default function initVueForms() {
                 // }),
             ],
             inputs: {
-                captcha: captchaInput,
+                captcha: captchaInput
             }
         })).mount(wrapper);
 
