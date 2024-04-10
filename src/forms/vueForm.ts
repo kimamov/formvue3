@@ -1,11 +1,11 @@
 import { createApp } from 'vue';
 import FormFromTypo3Json from "./formvue3/components/FormFromTypo3Json.vue";
-import { defaultConfig, plugin } from "@formkit/vue";
+import { createInput, defaultConfig, plugin } from "@formkit/vue";
 import '@formkit/themes/genesis'
 // import { createFloatingLabelsPlugin } from '@formkit/addons'
 // import { FormKitSchemaDefinition } from "@formkit/core";
 import { FormWrapper } from './formvue3/FormDefinition';
-
+import CaptchaInput from './formvue3/components/inputs/CaptchaInput.vue';
 
 export default function initVueForms() {
     const forms = document.querySelectorAll('[data-id]');
@@ -44,6 +44,9 @@ export default function initVueForms() {
                 //     useAsDefault: true, // defaults to false
                 // }),
             ],
+            inputs: {
+                captcha: createInput(CaptchaInput, { props: ['captchaUrl', 'width', 'height', 'refreshText'] })
+            }
         })).mount(wrapper);
 
 
