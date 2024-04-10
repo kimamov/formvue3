@@ -166,11 +166,6 @@ export function gridRow(el: ElementDefinition) {
   return schema;
 }
 
-export function gridCol(el: ElementDefinition) {
-  const schema = { $el: "div" }
-  return schema;
-
-}
 
 export function staticText(el: ElementDefinition) {
   return {
@@ -214,7 +209,7 @@ export const defaultMappings: Typo3ElementTypeToFormkitMapping = {
 }
 
 
-export function transformTypo3ForElementToFormkitSchema(typo3ElementDefinition: ElementDefinition, mappingsOverride?: Typo3ElementTypeToFormkitMapping = {}) {
+export function transformTypo3ForElementToFormkitSchema(typo3ElementDefinition: ElementDefinition, mappingsOverride: Typo3ElementTypeToFormkitMapping = {}) {
   const combinedMappings = { ...defaultMappings, ...mappingsOverride };
 
   const transformer = combinedMappings[typo3ElementDefinition.type];
