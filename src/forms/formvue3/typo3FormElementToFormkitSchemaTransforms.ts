@@ -69,7 +69,6 @@ export function simpleInputTransform(el: ElementDefinition, formkitType: string 
   if (el.properties?.options) {
     schema.options = el.properties.options;
     schema.placeholder = el.label;
-
   }
   // console.log(schema);
 
@@ -78,19 +77,31 @@ export function simpleInputTransform(el: ElementDefinition, formkitType: string 
 
 
 export function captchaInput(el: ElementDefinition): object {
-  const schema = {
+  const schema: any = {
     $formkit: 'captcha',
     label: el.label,
     value: el.defaultValue,
+    name: el.name,
     captchaUrl: el.properties?.gencaptchaUri,
     width: el.properties?.width,
     height: el.properties?.height,
     refreshText: el.properties?.refreshText,
-    // classes: {
-    //   name: el.name,
-    //   outer: `fv_${el.identifier}`
-    // }
+
   }
+
+  if (el.validators?.length) {
+
+    const validations = typo3ToFormkitValidation(el.validators);
+    if (validations.validation.length) {
+      schema.validation = validations.validation;
+      schema.validationMessages = validations.validationMessages;
+      schema.props = {};
+      schema.props.validation = validations.validation;
+      schema.props.validationMessages = validations.validationMessages;
+    }
+  }
+
+  console.log(schema);
 
   return schema;
 }
