@@ -6,20 +6,15 @@ import { ElementDefinition } from "../FormDefinition";
 import { transformTypo3ForElementToFormkitSchema } from '../typo3FormElementToFormkitSchemaTransforms';
 
 const props = defineProps({
-  formSchema: {
-    default: () => []
-  },
-  library: {
-    type: Object
-  },
-  // formKitSchemaProps: {
-  //   type: FormKitSchema
-  // },
   typo3FormConfig: {
     type: Object,
     required: true
   },
   typo3ToFormSchemaMappings: {
+    type: Object,
+    default: () => { }
+  },
+  formKitFormProps: {
     type: Object,
     default: () => { }
   }
@@ -49,7 +44,7 @@ async function submitForm(data: any) {
   <slot name="beforeWrapper"></slot>
   <div class="fv-app">
     <slot name="beforeSchema"></slot>
-    <FormKit type="form" @submit="submitForm">
+    <FormKit type="form" @submit="submitForm" v-bind="formKitFormProps">
       <FormKitSchema :schema="formkitSchemaFromTypo3Config" />
     </FormKit>
     <slot name="afterSchema"></slot>
